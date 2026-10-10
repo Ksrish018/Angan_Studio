@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { clearDemoData, saveStudioSettings, type FormState } from "@/app/actions";
+import { resetDashboard, saveStudioSettings, type FormState } from "@/app/actions";
 import type { Settings } from "@/lib/settings";
 import { field } from "./team-forms";
 
@@ -61,25 +61,35 @@ export function StudioSettingsForm({ s }: { s: Settings }) {
   );
 }
 
-export function GoLiveForm({ replayCalls, demoDesigners }: { replayCalls: number; demoDesigners: number }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(clearDemoData, {});
-  const nothing = replayCalls === 0 && demoDesigners === 0;
+export type ResetCounts = { calls: number; leads: number; logs: number; placeholders: number };
+
+export function ResetForm({ counts }: { counts: ResetCounts }) {
+  const [state, action, pending] = useActionState<FormState, FormData>(resetDashboard, {});
+  const empty = counts.calls === 0 && counts.logs === 0;
   return (
     <form action={action} className="card border-rose-ink/30 p-7">
-      <h2 className="font-serif text-[26px]">Go live</h2>
+      <h2 className="font-serif text-[26px]">Reset dashboard</h2>
       <p className="mt-2 text-[14px] leading-relaxed text-stone">
-        {nothing
-          ? "No demo data left. Everything here is real."
-          : `Removes the September replay (${replayCalls} calls) and the placeholder designers (${demoDesigners}), so only real calls and your real team remain. This can't be undone.`}
+        Starts the dashboard fresh: removes every call, enquiry, timeline, cost and connection log. Your team and studio settings stay.
+        HubSpot and Cal.com records are kept in those apps. This can&apos;t be undone.
       </p>
-      {!nothing && (
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <input name="confirm" placeholder="Type CLEAR" className={`${field} max-w-[180px]`} autoComplete="off" />
-          <button disabled={pending} className="rounded-full border border-rose-ink px-5 py-2.5 text-[14px] text-rose-ink transition-colors hover:bg-rose-ink hover:text-paper disabled:opacity-60">
-            {pending ? "Clearing…" : "Clear demo data"}
-          </button>
-        </div>
+      <dl className="mt-5 grid grid-cols-3 gap-3 border-y border-hairline-2 py-4 text-center">
+        <div><dt className="eyebrow">Calls</dt><dd className="mt-1 font-serif text-[24px] tabular">{counts.calls}</dd></div>
+        <div><dt className="eyebrow">Enquiries</dt><dd className="mt-1 font-serif text-[24px] tabular">{counts.leads}</dd></div>
+        <div><dt className="eyebrow">Log entries</dt><dd className="mt-1 font-serif text-[24px] tabular">{counts.logs}</dd></div>
+      </dl>
+      {counts.placeholders > 0 && (
+        <label className="mt-4 flex items-start gap-3 text-[14px] leading-snug">
+          <input type="checkbox" name="placeholders" className="mt-0.5 h-4 w-4 accent-[var(--color-rose-ink)]" />
+          <span>Also remove the {counts.placeholders} placeholder designer{counts.placeholders === 1 ? "" : "s"}</span>
+        </label>
       )}
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <input name="confirm" placeholder="Type RESET" className={`${field} max-w-[180px]`} autoComplete="off" />
+        <button disabled={pending} className="rounded-full border border-rose-ink px-5 py-2.5 text-[14px] text-rose-ink transition-colors hover:bg-rose-ink hover:text-paper disabled:opacity-60">
+          {pending ? "Resetting…" : empty ? "Reset anyway" : "Reset dashboard"}
+        </button>
+      </div>
       {state.error && <p role="alert" className="mt-3 text-[14px] text-rose-ink">{state.error}</p>}
       {state.ok && <p role="status" className="mt-3 text-[14px] text-sage-ink">{state.ok}</p>}
     </form>

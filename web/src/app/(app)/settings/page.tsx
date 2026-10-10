@@ -5,7 +5,7 @@ import { viewer } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
 import { healthChecks } from "@/lib/health";
 import { PageHeader, when } from "@/components/ui";
-import { GoLiveForm, StudioSettingsForm } from "@/components/settings-forms";
+import { ResetForm, StudioSettingsForm, type ResetCounts } from "@/components/settings-forms";
 
 const DOT = { ok: "bg-sage", warn: "bg-ochre", error: "bg-rose-ink" } as const;
 const WORD = { ok: "Working", warn: "Needs setup", error: "Not working" } as const;
@@ -17,7 +17,8 @@ export default async function SettingsPage() {
   const [s, health, [counts]] = await Promise.all([
     getSettings(),
     healthChecks(),
-    sql`select (select count(*)::int from calls where source = 'replay') as replay, (select count(*)::int from designers where is_demo) as demo`.then((r) => r as { replay: number; demo: number }[]),
+    sql`select (select count(*)::int from calls) as calls, (select count(*)::int from leads) as leads,
+         (select count(*)::int from integration_log) as logs, (select count(*)::int from designers where is_demo and active) as placeholders`.then((r) => r as ResetCounts[]),
   ]);
   const appUrl = process.env.APP_URL ?? "";
 
@@ -69,7 +70,7 @@ export default async function SettingsPage() {
             </ul>
             <p className="mt-4 text-[12px] leading-relaxed text-stone">The digest is emailed every Monday at 9:00 to the founder email. Internal pricing is never in exports or emails.</p>
           </div>
-          <GoLiveForm replayCalls={counts.replay} demoDesigners={counts.demo} />
+          <ResetForm counts={counts} />
         </div>
       </div>
     </div>

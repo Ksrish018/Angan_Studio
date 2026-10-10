@@ -7,6 +7,7 @@ import { viewer } from "@/lib/auth";
 import { saveSettings } from "@/lib/settings";
 import { sendLeadHandoff } from "@/lib/pipeline";
 import { cancelBooking } from "@/lib/integrations/calcom";
+import { STARTER_TEAM } from "@/lib/starter-team";
 
 export type FormState = { ok?: string; error?: string };
 
@@ -141,6 +142,26 @@ export async function updateDesigner(formData: FormData) {
   if (op === "resume") await sql`update designers set paused = false where id = ${id}`;
   if (op === "remove") await sql`update designers set active = false, paused = false where id = ${id}`;
   if (op === "principal") await sql`update designers set is_principal = not is_principal where id = ${id}`;
+  if (op === "edit") {
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim().toLowerCase();
+    if (name.length >= 2) await sql`update designers set name = ${name} where id = ${id}`;
+    if (EMAIL.test(email)) {
+      const [taken] = (await sql`select id from designers where lower(email) = ${email} and id <> ${id}`) as { id: number }[];
+      // A real address turns the placeholder into a real team member.
+      if (!taken) await sql`update designers set email = ${email}, is_demo = ${email.endsWith("@example.com")} where id = ${id}`;
+    }
+  }
+  revalidatePath("/", "layout");
+}
+
+// Brings back the starter roster (any removed starter designer is re-activated).
+export async function loadStarterTeam() {
+  for (const d of STARTER_TEAM) {
+    await sql`insert into designers (name, email, is_principal, specialty, is_demo)
+              values (${d.name}, ${d.email}, ${d.principal}, ${d.specialty}, true)
+              on conflict (email) do update set active = true, paused = false`;
+  }
   revalidatePath("/", "layout");
 }
 
@@ -174,12 +195,20 @@ export async function saveStudioSettings(_: FormState, formData: FormData): Prom
   return { ok: "Saved." };
 }
 
-// Go live: remove the September replay and the placeholder roster so only real calls remain.
-export async function clearDemoData(_: FormState, formData: FormData): Promise<FormState> {
-  if (String(formData.get("confirm") ?? "").trim().toUpperCase() !== "CLEAR") return { error: "Type CLEAR to confirm." };
-  await sql`delete from calls where source = 'replay'`;
-  await sql`update leads set designer_id = null where designer_id in (select id from designers where is_demo)`;
-  await sql`delete from designers where is_demo`;
+// Reset the dashboard: every call, enquiry, timeline entry, cost and connection log goes.
+// The team and studio settings stay. HubSpot and Cal.com records live in those apps and are not touched.
+export async function resetDashboard(_: FormState, formData: FormData): Promise<FormState> {
+  if (String(formData.get("confirm") ?? "").trim().toUpperCase() !== "RESET") return { error: "Type RESET to confirm." };
+  const [n] = (await sql`select (select count(*)::int from calls) as calls, (select count(*)::int from integration_log) as logs`) as { calls: number; logs: number }[];
+  await sql`delete from calls`; // leads, timelines and costs go with their call
+  await sql`delete from live_calls`;
+  await sql`delete from integration_log`;
+  await sql`delete from settings where left(key, 1) = '_'`; // background-job markers only, never studio settings
+  let team = "Your team and settings are kept.";
+  if (formData.get("placeholders") === "on") {
+    await sql`delete from designers where is_demo`;
+    team = "Placeholder designers removed; your real team and settings are kept.";
+  }
   revalidatePath("/", "layout");
-  return { ok: "Demo data cleared. Only real calls will appear from now on." };
+  return { ok: `Cleared ${n.calls} call${n.calls === 1 ? "" : "s"} and ${n.logs} log entr${n.logs === 1 ? "y" : "ies"}. ${team}` };
 }

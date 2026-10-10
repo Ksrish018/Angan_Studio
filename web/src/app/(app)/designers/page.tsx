@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { designers } from "@/lib/queries";
 import { viewer, canManage } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
-import { updateDesigner } from "@/app/actions";
+import { loadStarterTeam, updateDesigner } from "@/app/actions";
 import { PageHeader, when } from "@/components/ui";
 import { AddDesignerForm } from "@/components/team-forms";
 
@@ -21,6 +21,8 @@ function cover(specialty: string | null, principal: boolean, i: number) {
   return FOCUS.find(([re]) => specialty && re.test(specialty))?.[1] ?? FALLBACK[i % FALLBACK.length];
 }
 
+// Kept here: constants exported from a client module arrive as references in a server component.
+const field = "w-full rounded-xl border border-hairline bg-paper px-3.5 py-2 text-[14px] outline-none transition-colors placeholder:text-stone focus:border-ink";
 const btn = "rounded-full border border-hairline px-3 py-1.5 text-[12px] text-ink-2 transition-colors hover:border-ink hover:text-ink";
 
 export default async function Team() {
@@ -37,7 +39,7 @@ export default async function Team() {
       <p className="-mt-4 mb-10 max-w-2xl text-[15px] leading-relaxed text-stone">
         {available} designer{available === 1 ? "" : "s"} taking new consultations. Concierge gives each booking to whoever has the lightest load,
         and close referrals to the principal designer.
-        {demo && " The cards marked Placeholder are the demo roster: add your real designers, then clear the demo data in Settings."}
+        {demo && " Cards marked Placeholder are the starter team: you can assign consultations to them now, and replace each email with the designer's real one under Edit."}
       </p>
 
       {manage && (
@@ -53,6 +55,16 @@ export default async function Team() {
             {me.role === "founder" && <a href="/settings" className="mt-6 inline-block text-[13px] text-ink underline underline-offset-4">Change in Settings</a>}
           </div>
         </div>
+      )}
+
+      {rows.length === 0 && manage && (
+        <form action={loadStarterTeam} className="card mb-8 flex flex-wrap items-center justify-between gap-4 p-7">
+          <div>
+            <h2 className="font-serif text-[22px]">No designers yet</h2>
+            <p className="mt-1 max-w-xl text-[14px] text-stone">Add your designers above, or load the six-person starter team to assign consultations straight away.</p>
+          </div>
+          <button className="rounded-full bg-ink px-5 py-2.5 text-[14px] text-paper transition-opacity hover:opacity-85">Load starter team</button>
+        </form>
       )}
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -85,6 +97,17 @@ export default async function Team() {
                   <button name="op" value="principal" className={btn}>{d.is_principal ? "Not principal" : "Make principal"}</button>
                   <button name="op" value="remove" className={`${btn} hover:border-rose-ink hover:text-rose-ink`}>Remove</button>
                 </form>
+              )}
+              {manage && (
+                <details className="mt-3 group/edit">
+                  <summary className="cursor-pointer list-none text-[13px] text-ink-2 underline underline-offset-4">{d.is_demo ? "Edit · add real email" : "Edit name or email"}</summary>
+                  <form action={updateDesigner} className="mt-3 grid gap-2">
+                    <input type="hidden" name="id" value={d.id} />
+                    <input name="name" defaultValue={d.name} aria-label="Name" className={field} autoComplete="off" />
+                    <input name="email" type="email" defaultValue={d.is_demo ? "" : d.email} placeholder={d.is_demo ? "name@aanganstudio.in" : undefined} aria-label="Email" className={field} autoComplete="off" />
+                    <button name="op" value="edit" className={`${btn} justify-self-start`}>Save</button>
+                  </form>
+                </details>
               )}
             </div>
           </article>
