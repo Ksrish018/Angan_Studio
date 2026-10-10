@@ -1,0 +1,298 @@
+@import "tailwindcss";
+
+/* ---------- Themes ----------
+   linen (default day) · atelier (night) · gallery (white, modern) · courtyard (sand, teal)
+   "Auto" = no data-theme: linen by day, atelier when the device is in dark mode. */
+
+:root,
+:root[data-theme="linen"] {
+  --linen: #f6f2ec;
+  --paper: #fffdf9;
+  --ink: #1f1b16;
+  --ink-2: #4a433b;
+  --stone: #7a7064;
+  --hairline: #e7dfd3;
+  --hairline-2: #efe8dd;
+  --terracotta: #b5552e;
+  --terracotta-soft: #f6e4da;
+  --terracotta-ink: #8a3e1f;
+  --sage: #5f7a61;
+  --sage-soft: #e5ece3;
+  --sage-ink: #3e5640;
+  --ochre: #b88a2e;
+  --ochre-soft: #f5ead2;
+  --ochre-ink: #7a5a17;
+  --rose-soft: #f6dedb;
+  --rose-ink: #8c2f27;
+  --mute-soft: #eee9e1;
+  --bar: #b5552e;
+  --bar-2: #c9693f;
+  --band: #f1ebe2;
+  --hero: #1f1b16;
+  --hero-ink: #fffdf9;
+  --hero-img: url(/themes/linen.jpg);
+  --display: var(--font-fraunces);
+  --display-weight: 300;
+  color-scheme: light;
+}
+
+:root[data-theme="atelier"] {
+  --linen: #12100e;
+  --paper: #1a1714;
+  --ink: #efe7da;
+  --ink-2: #cdbfab;
+  --stone: #9a8d7b;
+  --hairline: #2d2822;
+  --hairline-2: #24201b;
+  --terracotta: #e2bf7f;
+  --terracotta-soft: #3a2d17;
+  --terracotta-ink: #f0d39c;
+  --sage: #9db892;
+  --sage-soft: #1f2a1c;
+  --sage-ink: #bcd4b1;
+  --ochre: #d8a64c;
+  --ochre-soft: #33280f;
+  --ochre-ink: #ecd096;
+  --rose-soft: #3a1e1a;
+  --rose-ink: #f0b0a6;
+  --mute-soft: #26221d;
+  --bar: #c9a05a;
+  --bar-2: #e2bf7f;
+  --band: #1f1b17;
+  --hero: #2a221a;
+  --hero-ink: #f6e8cf;
+  --hero-img: url(/themes/atelier.jpg);
+  --display: var(--font-fraunces);
+  --display-weight: 300;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --linen: #12100e;
+    --paper: #1a1714;
+    --ink: #efe7da;
+    --ink-2: #cdbfab;
+    --stone: #9a8d7b;
+    --hairline: #2d2822;
+    --hairline-2: #24201b;
+    --terracotta: #e2bf7f;
+    --terracotta-soft: #3a2d17;
+    --terracotta-ink: #f0d39c;
+    --sage: #9db892;
+    --sage-soft: #1f2a1c;
+    --sage-ink: #bcd4b1;
+    --ochre: #d8a64c;
+    --ochre-soft: #33280f;
+    --ochre-ink: #ecd096;
+    --rose-soft: #3a1e1a;
+    --rose-ink: #f0b0a6;
+    --mute-soft: #26221d;
+    --bar: #c9a05a;
+    --bar-2: #e2bf7f;
+    --band: #1f1b17;
+    --hero: #2a221a;
+    --hero-ink: #f6e8cf;
+    --hero-img: url(/themes/atelier.jpg);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="gallery"] {
+  --linen: #f5f5f3;
+  --paper: #ffffff;
+  --ink: #0d0d0d;
+  --ink-2: #3d3d3d;
+  --stone: #6b6b6b;
+  --hairline: #e6e6e4;
+  --hairline-2: #efefed;
+  --terracotta: #2f6b4f;
+  --terracotta-soft: #e3efe8;
+  --terracotta-ink: #1f4d38;
+  --sage: #3e7a57;
+  --sage-soft: #e3efe8;
+  --sage-ink: #24543a;
+  --ochre: #a67c1a;
+  --ochre-soft: #f4ecd6;
+  --ochre-ink: #6d5110;
+  --rose-soft: #f6e1df;
+  --rose-ink: #8c2f27;
+  --mute-soft: #ededeb;
+  --bar: #0d0d0d;
+  --bar-2: #2f6b4f;
+  --band: #eeeeec;
+  --hero: #0d0d0d;
+  --hero-ink: #ffffff;
+  --hero-img: url(/themes/gallery.jpg);
+  --display: var(--font-inter);
+  --display-weight: 600;
+  color-scheme: light;
+}
+
+:root[data-theme="courtyard"] {
+  --linen: #f3e7d3;
+  --paper: #fffaf1;
+  --ink: #22302e;
+  --ink-2: #4b4a3f;
+  --stone: #8a7658;
+  --hairline: #e6d6bb;
+  --hairline-2: #efe2cb;
+  --terracotta: #1f5f5b;
+  --terracotta-soft: #d9ebe6;
+  --terracotta-ink: #164744;
+  --sage: #4f7a4a;
+  --sage-soft: #e1ecd9;
+  --sage-ink: #35552f;
+  --ochre: #c98d1f;
+  --ochre-soft: #f6e5c3;
+  --ochre-ink: #7a5410;
+  --rose-soft: #f7dccb;
+  --rose-ink: #9a3f1c;
+  --mute-soft: #ece0ca;
+  --bar: #d39b2a;
+  --bar-2: #1f5f5b;
+  --band: #ecdfc8;
+  --hero: #1f5f5b;
+  --hero-ink: #fffaf1;
+  --hero-img: url(/themes/courtyard.jpg);
+  --display: var(--font-fraunces);
+  --display-weight: 400;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-linen: var(--linen);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-stone: var(--stone);
+  --color-hairline: var(--hairline);
+  --color-hairline-2: var(--hairline-2);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-soft: var(--terracotta-soft);
+  --color-terracotta-ink: var(--terracotta-ink);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-sage-ink: var(--sage-ink);
+  --color-ochre: var(--ochre);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-ochre-ink: var(--ochre-ink);
+  --color-rose-soft: var(--rose-soft);
+  --color-rose-ink: var(--rose-ink);
+  --color-mute-soft: var(--mute-soft);
+  --color-hero: var(--hero);
+  --color-hero-ink: var(--hero-ink);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--display);
+}
+
+html {
+  background: var(--linen);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--linen);
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  transition: background-color 400ms ease, color 400ms ease;
+}
+
+.font-serif {
+  font-weight: var(--display-weight);
+  letter-spacing: -0.015em;
+}
+:root[data-theme="gallery"] .font-serif {
+  letter-spacing: -0.035em;
+}
+
+.wrap {
+  margin-inline: auto;
+  max-width: 1240px;
+  padding-inline: 20px;
+}
+@media (min-width: 768px) {
+  .wrap { padding-inline: 40px; }
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+.glass {
+  background: color-mix(in oklab, var(--linen) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.hero-img {
+  background-image: var(--hero-img);
+  background-size: cover;
+  background-position: center;
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+::selection { background: var(--terracotta-soft); }
+
+/* ---------- Motion ---------- */
+@keyframes rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes settle { from { transform: scale(1.06); } to { transform: scale(1); } }
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--sage) 55%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+.anim-rise { transform-origin: bottom; animation: rise 800ms cubic-bezier(.2,.7,.2,1) both; }
+.anim-grow { transform-origin: left; animation: grow 800ms cubic-bezier(.2,.7,.2,1) both; }
+.anim-fade-up { animation: fade-up 600ms cubic-bezier(.2,.7,.2,1) both; }
+.pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+/* Scroll-driven effects (Apple-style): sections lift in as they enter, the hero image drifts as you scroll.
+   Browsers without scroll timelines simply show everything. */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(48px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-drift {
+  to { transform: scale(1.12) translateY(6%); }
+}
+@keyframes hero-fade {
+  to { opacity: 0; transform: translateY(-40px); }
+}
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+  .hero-drift {
+    animation: hero-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 90vh;
+  }
+  .hero-copy {
+    animation: hero-fade linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 60vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}

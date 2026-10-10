@@ -1,0 +1,24 @@
+Vaani Platform Invite codes for Mesa.xlsx
+drive-download-*/
+~$*
+Vani Website.txt
+.env
+.env.*
+!.env.example
+
+# Course source material (kept private; the app's knowledge lives in web/src/knowledge)
+Doc1.docx
+Aangan_Sep 2026_Enquiries.pdf
+pricing.md
+qualified.md
+services.md
+web/data/
+design/
+
+# Local tooling
+.claude/
+web/.vercel/
+web/.env*
+!web/.env.example
+web/q.tmp.*
+*.tsbuildinfo

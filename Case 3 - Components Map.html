@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aangan Components Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #ffffff; font-family: Inter, "Segoe UI", Arial, sans-serif; color: #13294B; }
+  .wrap { max-width: 1820px; margin: 0 auto; padding: 8px 12px 24px; }
+  svg { width: 100%; height: auto; display: block; }
+  .box { box-sizing: border-box; width: 100%; height: 100%; border: 2px solid; border-radius: 10px;
+         display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+         padding: 8px 12px; gap: 5px; }
+  .box b { font-size: 15.5px; font-weight: 600; line-height: 1.25; }
+  .box span { font-size: 13px; line-height: 1.35; }
+  .badge { font-size: 11px !important; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+           background: #E0612F; color: #fff; padding: 2px 8px; border-radius: 999px; }
+  .trig { background: #E4E2FB; border-color: #5B54D6; color: #26215C; }
+  .ai   { background: #FDE4EF; border-color: #D9468A; color: #5A1534; }
+  .ctx  { background: #E3F6E5; border-color: #3FAE56; color: #173F1F; }
+  .proc { background: #FFF1CC; border-color: #E8A317; color: #4A3300; }
+  .hum  { background: #FFE2D6; border-color: #E0612F; color: #5A2410; border-width: 2.5px; }
+  .mail { background: #E3EEFC; border-color: #2F6FD6; color: #0C2F66; }
+  .out  { background: #FDE3E1; border-color: #E2483D; color: #5E1611; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<svg id="map" viewBox="0 0 1820 1250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Components map for the Aangan Studio phone enquiry agent">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#1F3A5F"/>
+    </marker>
+  </defs>
+  <g id="bg"></g>
+  <g id="arrows"></g>
+  <g id="boxes"></g>
+</svg>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const X0 = 215, CW = 265, Y0 = 155, LH = 170, BW = 236, BH = 134;
+const cols = ["Trigger", "Input", "Context", "Processing", "AI", "Output"];
+const lanes = [
+  ["Caller", "(Client)", "#E9F1FD"],
+  ["AI voice agent", "(LLM)", "#EEF9F0"],
+  ["System", "(App backend)", "#FFFBEA"],
+  ["Humans", "(Designer / Front desk)", "#FFF1E8"],
+  ["Email + Calendar", "(Gmail / Google Cal)", "#FDEEF4"],
+  ["Founder", "(Nikhil)", "#F1F3F8"]
+];
+const cx = c => X0 + CW * (c - 1) + CW / 2;
+const cy = l => Y0 + LH * (l - 1) + LH / 2;
+
+const boxes = {
+  B1: [1, 1, "trig", "", "Client calls the studio number", "Any time: day, night or weekend"],
+  B2: [2, 2, "ai", "", "AI voice agent answers in 2 rings", "Collects name, area, scope, sq ft, timeline, who decides, budget (only if they say it)"],
+  B3: [3, 3, "ctx", "", "Loads the studio rulebook", "services.md, qualified.md (5 criteria), the never-quote rule, designer calendars"],
+  B4: [3, 4, "proc", "", "Checks Nikhil's 5 criteria", "Real project, Pune/PCMC, timeline, budget fit, decision-maker. Then: book, ask 1 question, decline or escalate"],
+  B5: [2, 5, "ai", "", "Writes the handoff note and replies to the client", "Books a slot or declines kindly. Price asked: approved line only, no numbers"],
+  B6: [3, 6, "proc", "", "Logs every call", "Outcome, reason, call minutes and AI cost per call"],
+  P1: [4, 2, "hum", "Human judgment", "Pricing stays with the designer", "AI never gives a rate, range or \"around\". Note is flagged \"asked about price\""],
+  H2: [4, 3, "hum", "Human check", "Front desk reviews declines", "Every decline and unclear lead checked next morning. Call back if the AI got it wrong"],
+  H1: [4, 4, "hum", "Human, urgent", "Existing-client complaint", "AI does not handle it. A senior person calls back within 15 min"],
+  E1: [5, 5, "mail", "", "Blocks designer's calendar and emails the note", "Calendar invite with the full brief, CC front desk. Client gets an SMS confirmation"],
+  H3: [4, 6, "hum", "Human judgment", "Designer runs the consultation", "Already knows everything. Sees the site, then gives the price"],
+  B9: [1, 6, "out", "", "Client is answered in under 5 minutes", "Booked consultation + SMS, or an honest \"not the right fit\""],
+  F1: [6, 6, "out", "", "Nikhil's live dashboard", "Calls answered, reply time, qualified %, bookings, decline reasons, cost per call and per booking"]
+};
+
+const box = id => { const [l, c] = boxes[id]; const x = cx(c) - BW / 2, y = cy(l) - BH / 2;
+  return { x, y, r: x + BW, b: y + BH, mx: cx(c), my: cy(l) }; };
+const R = (id, dy = 0) => [box(id).r, box(id).my + dy];
+const L = (id, dy = 0) => [box(id).x, box(id).my + dy];
+const T = (id, dx = 0) => [box(id).mx + dx, box(id).y];
+const B = (id, dx = 0) => [box(id).mx + dx, box(id).b];
+const viaX = (a, b, x) => [a, [x, a[1]], [x, b[1]], b];
+const vFirst = (a, b) => [a, [a[0], b[1]], b];
+const hFirst = (a, b) => [a, [b[0], a[1]], b];
+
+const arrows = [
+  viaX(R("B1"), L("B2"), 480),
+  viaX(R("B2"), L("B3"), 745),
+  [R("B3"), L("B4")],
+  vFirst(T("B4"), L("B5")),
+  vFirst(T("B5"), L("B9")),
+  viaX(R("B5", 22), L("B6"), 1540),
+  [B("B5"), T("E1")],
+  hFirst(R("E1"), B("H3")),
+  [R("B6"), [1802, R("B6")[1]], [1802, R("F1")[1]], R("F1")],
+  [B("B4"), T("H1")],
+  viaX(L("B4", 32), R("H2"), 1010),
+  [B("B2"), T("P1")]
+];
+
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const bg = document.getElementById("bg"), ar = document.getElementById("arrows"), bx = document.getElementById("boxes");
+
+el("text", { x: 910, y: 52, "text-anchor": "middle", "font-size": 32, "font-weight": 700, fill: "#13294B" }, bg,
+   "Case 3 · Aangan Studio Enquiry Agent — Components Map");
+el("rect", { x: 20, y: 85, width: 1785, height: 70, rx: 10, fill: "#13294B" }, bg);
+el("text", { x: 117, y: 128, "text-anchor": "middle", "font-size": 21, "font-weight": 500, fill: "#fff" }, bg, "Actor");
+cols.forEach((c, i) => el("text", { x: cx(i + 1), y: 128, "text-anchor": "middle", "font-size": 21, "font-weight": 500, fill: "#fff" }, bg, c));
+lanes.forEach(([name, sub, color], i) => {
+  const y = Y0 + LH * i;
+  el("rect", { x: X0, y, width: CW * 6 - 10, height: LH, fill: color }, bg);
+  el("rect", { x: 20, y, width: 195, height: LH, fill: "#13294B" }, bg);
+  el("line", { x1: 20, y1: y, x2: 1805, y2: y, stroke: "#ffffff", "stroke-width": 2 }, bg);
+  el("text", { x: 117, y: y + LH / 2 - 4, "text-anchor": "middle", "font-size": 20, "font-weight": 600, fill: "#fff" }, bg, name);
+  el("text", { x: 117, y: y + LH / 2 + 22, "text-anchor": "middle", "font-size": 15, fill: "#C9D3E6" }, bg, sub);
+});
+for (let i = 1; i < 6; i++) el("line", { x1: X0 + CW * i, y1: Y0, x2: X0 + CW * i, y2: Y0 + LH * 6, stroke: "#ffffff", "stroke-width": 2 }, bg);
+
+arrows.forEach(pts => el("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: "#1F3A5F",
+  "stroke-width": 1.8, "stroke-dasharray": "6 5", "marker-end": "url(#ah)" }, ar));
+
+for (const id in boxes) {
+  const [, , cls, badge, title, sub] = boxes[id]; const g = box(id);
+  const fo = el("foreignObject", { x: g.x, y: g.y, width: BW, height: BH }, bx);
+  fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" class="box ${cls}">${badge ? `<span class="badge">${badge}</span>` : ""}<b>${title}</b><span>${sub}</span></div>`;
+}
+
+const ly = Y0 + LH * 6 + 38;
+el("rect", { x: 20, y: ly - 18, width: 26, height: 22, rx: 5, fill: "#FFE2D6", stroke: "#E0612F", "stroke-width": 2.5 }, bg);
+el("text", { x: 56, y: ly, "font-size": 15, fill: "#13294B" }, bg, "Orange = human judgment point (AI does not decide)");
+el("line", { x1: 470, y1: ly - 6, x2: 520, y2: ly - 6, stroke: "#1F3A5F", "stroke-width": 1.8, "stroke-dasharray": "6 5", "marker-end": "url(#ah)" }, bg);
+el("text", { x: 532, y: ly, "font-size": 15, fill: "#13294B" }, bg, "Flow of the enquiry");
+el("text", { x: 740, y: ly, "font-size": 15, fill: "#5A6B85" }, bg,
+   "Scope: phone calls only. WhatsApp and the web form can plug into the same rulebook and checks later.");
+</script>
+</body>
+</html>
